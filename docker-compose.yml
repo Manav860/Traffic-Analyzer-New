@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  soc_dashboard:
+    build: .
+    container_name: sih_world_model_soc
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./model/weights:/app/model/weights
+    restart: unless-stopped

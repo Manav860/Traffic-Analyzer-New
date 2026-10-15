@@ -1,0 +1,21 @@
+# Large machine-learning datasets
+MachineLearningCVE/*.csv
+
+# Temporary network captures
+data/raw/*.pcap
+data/raw/_live_*
+
+# Python generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment secrets
+.env    
+.git-backup/
+data/raw/synthetic_flows.csv

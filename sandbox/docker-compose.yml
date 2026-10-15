@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Attacker container (Recon, Brute Force, Pivoting, C2 simulation)
+  attacker:
+    build:
+      context: .
+      dockerfile: Dockerfile.attacker
+    container_name: sih_attacker
+    networks:
+      sandbox_net:
+        ipv4_address: 10.0.0.100
+    environment:
+      - VICTIM_IP=10.0.0.5
+      - PIVOT_IP=10.0.0.20
+      - C2_IP=203.0.113.88
+    depends_on:
+      - victim
+      - pivot_target
+
+  # Victim target container (simulates initial entry point)
+  victim:
+    build:
+      context: .
+      dockerfile: Dockerfile.victim
+    container_name: sih_victim
+    networks:
+      sandbox_net:
+        ipv4_address: 10.0.0.5
+    ports:
+      - "8080:80"
+      - "2222:22"
+
+  # Internal pivot target host (simulates secondary internal server)
+  pivot_target:
+    image: alpine:latest
+    container_name: sih_pivot_target
+    command: ["sh", "-c", "while true; do sleep 3600; done"]
+    networks:
+      sandbox_net:
+        ipv4_address: 10.0.0.20
+
+  # Continuous packet sniffer recording sandbox traffic
+  sniffer:
+    image: alpine:latest
+    container_name: sih_sniffer
+    command: ["sh", "-c", "apk add --no-cache tcpdump && tcpdump -i eth0 -w /captures/live_sandbox.pcap"]
+    network_mode: "service:victim"
+    volumes:
+      - ../data/raw:/captures
+
+networks:
+  sandbox_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24

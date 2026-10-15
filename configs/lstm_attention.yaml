@@ -1,0 +1,40 @@
+# Configuration for LSTM + Attention World Model
+
+experiment:
+  name: "world_model_lstm_attention"
+  random_seed: 42
+
+dataset:
+  window_size_sec: 5.0
+  sequence_length: 10   # Number of historical time windows (t-9 ... t)
+  rollout_horizon_k: 5  # Number of forward steps to simulate (t+1 ... t+5)
+  stride: 1
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  held_out_attack_category: "Initial Access" # Real CIC-IDS-2017 held-out category for zero-shot testing
+
+model:
+  type: "lstm_attention"
+  input_dim: 28         # Fused state dimension
+  hidden_dim: 128
+  num_layers: 2
+  attention_dim: 64
+  dropout: 0.2
+  num_stages: 6         # Benign, Recon, Initial Access, Lateral Move, C2, Exfil
+
+training:
+  batch_size: 64
+  epochs: 15
+  learning_rate: 0.002
+  weight_decay: 0.00005
+  loss_alpha_dynamics: 0.4    # MSE loss weight on future state prediction
+  loss_beta_classification: 0.6 # CrossEntropy loss on attack stage & infiltration probability
+  patience: 10                # Early stopping patience
+  device: "auto"              # 'cuda', 'cpu', or 'auto'
+
+paths:
+  train_data: "data/processed/fused_state.csv"
+  model_checkpoint: "model/weights/world_model_final.pt"
+  baseline_checkpoint: "model/weights/baseline_final.pkl"
+  scaler_path: "model/weights/scaler.pkl"

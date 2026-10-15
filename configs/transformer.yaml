@@ -1,0 +1,40 @@
+# Configuration for Temporal Transformer World Model
+
+experiment:
+  name: "world_model_temporal_transformer"
+  random_seed: 42
+
+dataset:
+  window_size_sec: 5.0
+  sequence_length: 10
+  rollout_horizon_k: 5
+  stride: 1
+  train_split: 0.70
+  val_split: 0.15
+  test_split: 0.15
+  held_out_attack_category: "Lateral Movement"
+
+model:
+  type: "temporal_transformer"
+  input_dim: 28
+  hidden_dim: 128
+  num_heads: 4
+  num_layers: 2
+  dim_feedforward: 256
+  dropout: 0.2
+  num_stages: 6
+
+training:
+  batch_size: 128
+  epochs: 20
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  loss_alpha_dynamics: 0.5
+  loss_beta_classification: 0.5
+  patience: 5
+  device: "auto"
+
+paths:
+  train_data: "data/processed/fused_state.csv"
+  model_checkpoint: "model/weights/transformer_world_model_final.pt"
+  scaler_path: "model/weights/scaler.pkl"

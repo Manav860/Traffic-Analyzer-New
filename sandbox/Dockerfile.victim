@@ -1,0 +1,16 @@
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    nginx \
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure weak test credentials for initial access simulation
+RUN echo 'root:password123' | chpasswd
+RUN useradd -m -s /bin/bash admin && echo 'admin:password123' | chpasswd
+RUN mkdir /var/run/sshd
+
+EXPOSE 80 22 445
+
+CMD ["sh", "-c", "service ssh start && nginx -g 'daemon off;'"]
